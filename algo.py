@@ -101,6 +101,26 @@ def check_win(player):
     return False
 
 def ai_move():
+    # Check if AI can win
+    for row in range(BOARD_ROWS):
+        for col in range(BOARD_COLS):
+            if available_square(row, col):
+                board[row][col] = 2
+                if check_win(2):
+                    return True
+                board[row][col] = 0
+    
+    # Check if AI needs to block player
+    for row in range(BOARD_ROWS):
+        for col in range(BOARD_COLS):
+            if available_square(row, col):
+                board[row][col] = 1
+                if check_win(1):
+                    board[row][col] = 2
+                    return True
+                board[row][col] = 0
+    
+    # Otherwise, make a random move
     empty_squares = [(row, col) for row in range(BOARD_ROWS) for col in range(BOARD_COLS) if available_square(row, col)]
     if empty_squares:
         row, col = random.choice(empty_squares)
@@ -143,11 +163,15 @@ while True:
                     mark_square(clicked_row, clicked_col, player)
                     if check_win(player):
                         game_over = True
+                    elif is_board_full():
+                        game_over = True
                     player = 2
                     draw_figures()
 
                 if player == 2 and not game_over:
                     if ai_move():
+                        game_over = True
+                    elif is_board_full():
                         game_over = True
                     player = 1
                     draw_figures()
