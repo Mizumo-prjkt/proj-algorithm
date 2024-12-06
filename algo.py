@@ -83,49 +83,60 @@ def check_win(player):
     # Vertical win check
     for col in range(BOARD_COLS):
         if board[0][col] == player and board[1][col] == player and board[2][col] == player:
+            print(f"{'Player' if player == 1 else 'AI'} wins with vertical line at column {col}")
             return True
     
     # Horizontal win check
     for row in range(BOARD_ROWS):
         if board[row][0] == player and board[row][1] == player and board[row][2] == player:
+            print(f"{'Player' if player == 1 else 'AI'} wins with horizontal line at row {row}")
             return True
     
     # Ascending diagonal win check
     if board[2][0] == player and board[1][1] == player and board[0][2] == player:
+        print(f"{'Player' if player == 1 else 'AI'} wins with ascending diagonal from (2, 0) to (0, 2)")
         return True
     
     # Descending diagonal win check
     if board[0][0] == player and board[1][1] == player and board[2][2] == player:
+        print(f"{'Player' if player == 1 else 'AI'} wins with descending diagonal from (0, 0) to (2, 2)")
         return True
 
     return False
 
 def ai_move():
-    # Check if AI can win
-    for row in range(BOARD_ROWS):
-        for col in range(BOARD_COLS):
-            if available_square(row, col):
-                board[row][col] = 2
-                if check_win(2):
-                    return True
-                board[row][col] = 0
-    
-    # Check if AI needs to block player
-    for row in range(BOARD_ROWS):
-        for col in range(BOARD_COLS):
-            if available_square(row, col):
-                board[row][col] = 1
-                if check_win(1):
+    difficulty = random.choice(['easy', 'hard'])
+
+    if difficulty == 'hard':
+        # Check if AI can win
+        for row in range(BOARD_ROWS):
+            for col in range(BOARD_COLS):
+                if available_square(row, col):
                     board[row][col] = 2
-                    return True
-                board[row][col] = 0
-    
-    # Otherwise, make a random move
+                    if check_win(2):
+                        print(f"AI wins by placing at ({row}, {col})")
+                        return True
+                    board[row][col] = 0
+        
+        # Check if AI needs to block player
+        for row in range(BOARD_ROWS):
+            for col in range(BOARD_COLS):
+                if available_square(row, col):
+                    board[row][col] = 1
+                    if check_win(1):
+                        board[row][col] = 2
+                        print(f"AI blocks player at ({row}, {col})")
+                        return False # Block but don't declare win
+                    board[row][col] = 0
+        
+    # Otherwise, make a random move (easy mode or fallback)
     empty_squares = [(row, col) for row in range(BOARD_ROWS) for col in range(BOARD_COLS) if available_square(row, col)]
     if empty_squares:
         row, col = random.choice(empty_squares)
         mark_square(row, col, 2)
+        print(f"AI ({difficulty}) places at ({row}, {col})")
         if check_win(2):
+            print(f"AI wins with random move from ({row}, {col})")
             return True
     return False
 
@@ -137,6 +148,7 @@ def restart_game():
     screen.fill(BG_COLOR)
     draw_lines()
     draw_button()
+    print("Game restarted")
 
 # Game Loop
 player = 1
@@ -161,9 +173,12 @@ while True:
 
                 if available_square(clicked_row, clicked_col) and not game_over and player == 1:
                     mark_square(clicked_row, clicked_col, player)
+                    print(f"Player places at ({clicked_row}, {clicked_col})")
                     if check_win(player):
+                        print(f"Player wins by connecting at ({clicked_row}, {clicked_col})")
                         game_over = True
                     elif is_board_full():
+                        print("Game ended in a draw")
                         game_over = True
                     player = 2
                     draw_figures()
@@ -172,6 +187,7 @@ while True:
                     if ai_move():
                         game_over = True
                     elif is_board_full():
+                        print("Game ended in a draw")
                         game_over = True
                     player = 1
                     draw_figures()
