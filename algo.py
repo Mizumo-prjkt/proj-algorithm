@@ -32,6 +32,9 @@ screen.fill(BG_COLOR)
 # Board setup
 board = np.zeros((BOARD_ROWS, BOARD_COLS))
 
+# AI difficulty (global variable)
+ai_difficulty = None
+
 # Drawing functions
 def draw_lines():
     # Horizontal lines
@@ -105,9 +108,7 @@ def check_win(player):
     return False
 
 def ai_move():
-    difficulty = random.choice(['easy', 'hard'])
-
-    if difficulty == 'hard':
+    if ai_difficulty == 'hard':
         # Check if AI can win
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
@@ -134,25 +135,30 @@ def ai_move():
     if empty_squares:
         row, col = random.choice(empty_squares)
         mark_square(row, col, 2)
-        print(f"AI ({difficulty}) places at ({row}, {col})")
+        print(f"AI ({ai_difficulty}) places at ({row}, {col})")
         if check_win(2):
             print(f"AI wins with random move from ({row}, {col})")
             return True
     return False
 
 def restart_game():
-    global board, game_over, player
+    global board, game_over, player, ai_difficulty
     board = np.zeros((BOARD_ROWS, BOARD_COLS))
     game_over = False
     player = 1
+    ai_difficulty = random.choice(['easy', 'hard']) # Set AI difficulty on restart
     screen.fill(BG_COLOR)
     draw_lines()
     draw_button()
-    print("Game restarted")
+    print(f"Game restarted with AI difficulty: {ai_difficulty}")
 
 # Game Loop
 player = 1
 game_over = False
+
+# Set initial AI difficulty
+ai_difficulty = random.choice(['easy', 'hard'])
+print(f"Initial AI difficulty: {ai_difficulty}")
 
 draw_lines()
 draw_button()
